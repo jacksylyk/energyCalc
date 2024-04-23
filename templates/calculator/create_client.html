@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Create Client</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- Contact formset -->
+        <input type="hidden" name="contacts_array" id="contactsArrayInput">
+
+        <h4>Contact Information</h4>
+        <table id="contactsTable" class="table table-bordered">
+            <tr>
+                <th>Телефон</th>
+                <th>Действие</th>
+            </tr>
+        </table>
+        <button onclick="addContact()" type="button">Добавить контакт</button>
+
+        <button type="submit" onclick="submitContacts()">Create</button>
+    </form>
+    <script>
+        function addContact() {
+            var table = document.getElementById("contactsTable");
+            var row = table.insertRow(-1);
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            cell1.innerHTML = "<input type='text'>";
+            cell2.innerHTML = "<button onclick='deleteContact(this)'>Удалить</button>";
+        }
+
+        function deleteContact(row) {
+            var rowIndex = row.parentNode.parentNode.rowIndex;
+            document.getElementById("contactsTable").deleteRow(rowIndex);
+        }
+
+        function submitContacts() {
+            var table = document.getElementById("contactsTable");
+            var contactsArray = [];
+            for (var i = 1; i < table.rows.length; i++) {
+                var contact = {
+                    phone: table.rows[i].cells[0].getElementsByTagName("input")[0].value
+                };
+                contactsArray.push(contact);
+            }
+            document.getElementById("contactsArrayInput").value = JSON.stringify(contactsArray);
+        }
+    </script>
+{% endblock content %}

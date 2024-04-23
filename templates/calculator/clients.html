@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Client List</h1>
+    <table class="table table-stripped table-bordered">
+        <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>БИН</th>
+                <th>Информация ПКУ</th>
+                <th>Примечания</th>
+                <th>Номер договора</th>
+                <th>Дата акта</th>
+                <th>Контактные данные</th>
+                <th>Местоположение ПКУ</th>
+                <th>Группа потребителей</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td>{{ client.name }}</td>
+                <td>{{ client.bin_number }}</td>
+                <td>{{ client.information }}</td>
+                <td>{{ client.notes }}</td>
+                <td>{{ client.contract_number }}</td>
+                <td>{{ client.contract_date }}</td>
+                <td>
+                    {% for contact in client.contacts.all %}
+                        <p>{{ contact.contact }}</p>
+                    {% endfor %}
+                </td>
+                <td>{{ client.location }}</td>
+                <td>
+                    <select name="" id="">
+                        <option value="">Местный бюджет</option>
+                        <option value="">Республиканский бюджет</option>
+                        <option value="">Юридическое  лицо</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock content %}
