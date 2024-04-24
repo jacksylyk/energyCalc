@@ -17,7 +17,7 @@ class ClientCreateView(CreateView):
     model = Client
     fields = '__all__'
     template_name = "calculator/create_client.html"
-    success_url = "home"
+    success_url = "index"
 
     def form_valid(self, form):
         form.instance.user = self.request.user
