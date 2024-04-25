@@ -1,10 +1,11 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, CreateView
 
-from calculator.models import Client, Contact
+from calculator.forms import InvoiceForm
+from calculator.models import Client, Contact, Invoice
 
 
 # Create your views here.
@@ -47,3 +48,18 @@ class ClientListView(ListView):
         return Client.objects.all()
 
     template_name = 'calculator/clients.html'
+
+
+def create_invoice(request):
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            invoice = form.save()
+            return redirect('invoice_detail', pk=invoice.pk)
+    else:
+        form = InvoiceForm()
+    return render(request, 'calculator/create_invoice.html', {'form': form})
+
+def invoice_detail(request, pk):
+    invoice = get_object_or_404(Invoice, pk=pk)
+    return render(request, 'calculator/invoice_detail.html', {'invoice': invoice})

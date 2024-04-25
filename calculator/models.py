@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -14,6 +17,9 @@ class Client(models.Model):
     class Meta:
         verbose_name_plural = 'Клиенты'
 
+    def __str__(self):
+        return self.name
+
 
 class Contact(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='contacts', verbose_name="Клиент")
@@ -21,3 +27,28 @@ class Contact(models.Model):
 
     def __str__(self):
         return self.contact
+
+
+# Модель для счета
+class Invoice(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices', verbose_name="Клиент")
+    ktt = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="KTT")
+    voltage = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)],
+                                  verbose_name="Напряжение")
+    start = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)],
+                                verbose_name="Начало")
+    end = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Конец")
+
+    # Потребление
+    @property
+    def consumption(self):
+        return (self.end - self.start) * self.ktt
+
+    # Без НДС
+    @property
+    def without_vat(self):
+        return self.consumption * Decimal('50.527')
+
+    class Meta:
+        verbose_name = 'Счет'
+        verbose_name_plural = 'Счета'
