@@ -1,8 +1,60 @@
 {% extends 'base.html' %}
 {% block content %}
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Создать счет</button>
-</form>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-6">
+            <label for="{{ form.client.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Клиенты</label>
+            <select name="{{ form.client.name }}" id="{{ form.client.id_for_label }}"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option selected disabled>Выберите клиента</option>
+                {% for client in clients %}
+                    <option value="{{ client.id }}">{{ client.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div>
+                <label for="{{ form.start.id_for_label }}"
+                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Начало</label>
+                <input type="number" id="{{ form.start.id_for_label }}" name="{{ form.start.name }}"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                       required/>
+            </div>
+            <div>
+                <label for="{{ form.end.id_for_label }}"
+                       class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Конец</label>
+                <input type="number" id="{{ form.end.id_for_label }}" name="{{ form.end.name }}"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                       required/>
+            </div>
+        </div>
+        <div class="mb-6">
+            <label for="{{ form.voltage.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Напряжение</label>
+            <input type="number" id="{{ form.voltage.id_for_label }}" name="{{ form.voltage.name }}"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   required/>
+        </div>
+        <div class="mb-6">
+            <label for="{{ form.ktt.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">КТТ</label>
+            <input type="number" id="{{ form.voltage.id_for_label }}" name="{{ form.voltage.name }}"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   required/>
+        </div>
+        <div class="mb-6">
+            <label for="{{ form.xx.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">XX</label>
+            <input type="number" id="{{ form.xx.id_for_label }}" name="{{ form.xx.name }}"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   required
+                   placeholder="XX %"
+            />
+        </div>
+        <button type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Создать счет
+        </button>
+    </form>
 {% endblock %}

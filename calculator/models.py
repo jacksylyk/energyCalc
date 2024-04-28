@@ -32,17 +32,18 @@ class Contact(models.Model):
 # Модель для счета
 class Invoice(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices', verbose_name="Клиент")
-    ktt = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="KTT")
-    voltage = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)],
+    ktt = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="KTT")
+    voltage = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
                                   verbose_name="Напряжение")
-    start = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)],
+    start = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
                                 verbose_name="Начало")
-    end = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], verbose_name="Конец")
+    end = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Конец")
+    xx = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="XX")
 
     # Потребление
     @property
     def consumption(self):
-        return (self.end - self.start) * self.ktt
+        return ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
 
     # Без НДС
     @property
