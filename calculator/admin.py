@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Client, Contact
+from .models import Client, Contact, Invoice
 
 
 class ContactInline(admin.TabularInline):
@@ -15,4 +15,5 @@ class ClientAdmin(admin.ModelAdmin):
     inlines = [ContactInline]
 
 
+admin.site.register(Invoice)
 admin.site.register(Client, ClientAdmin)

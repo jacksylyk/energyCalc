@@ -6,7 +6,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
 
-from calculator.forms import InvoiceForm
 from calculator.models import Client, Contact, Invoice
 
 
@@ -26,7 +25,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     model = Client
     fields = '__all__'
     template_name = "calculator/create_client.html"
-    success_url = "home"
+    success_url = reverse_lazy('clients')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -55,13 +54,27 @@ class ClientListView(LoginRequiredMixin, ListView):
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     model = Invoice
-    form_class = InvoiceForm
+    fields = '__all__'
     template_name = 'calculator/create_invoice.html'
-    success_url = reverse_lazy('invoice_detail')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+    def get_success_url(self):
+        if self.object:  # Check if self.object exists
+            pk = self.object.pk
+            return reverse_lazy('invoice_detail', kwargs={'pk': pk})
+        else:
+            # Provide a fallback URL if self.object is not defined
+            return reverse_lazy('index')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        client_id = self.request.GET.get('client_id')
+        if client_id:
+            kwargs['initial'] = {'client': client_id}
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

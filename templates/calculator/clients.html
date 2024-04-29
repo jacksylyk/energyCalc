@@ -93,6 +93,7 @@
                 <th scope="col" class="px-6 py-3">Контактные данные</th>
                 <th scope="col" class="px-6 py-3">Местоположение ПКУ</th>
                 <th scope="col" class="px-6 py-3">Группа потребителей</th>
+                <th scope="col" class="px-6 py-3">Счет</th>
             </tr>
             </thead>
             <tbody>
@@ -119,6 +120,7 @@
                             <option value="">Юридическое лицо</option>
                         </select>
                     </td>
+                    <td><a href="{% url 'create_invoice' %}?client_id={{ client.id }}">Создать счет</a></td>
                 </tr>
             {% endfor %}
             </tbody>

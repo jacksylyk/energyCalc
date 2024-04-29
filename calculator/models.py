@@ -13,6 +13,7 @@ class Client(models.Model):
     contract_date = models.DateField(verbose_name="Дата акта")
     location = models.CharField(max_length=128, verbose_name="Местоположение ПКУ", blank=True)
     notes = models.CharField(max_length=256, verbose_name="Примечания", blank=True)
+    address = models.CharField(max_length=256, verbose_name="Юридический адрес", blank=True)
 
     class Meta:
         verbose_name_plural = 'Клиенты'
@@ -39,6 +40,7 @@ class Invoice(models.Model):
                                 verbose_name="Начало")
     end = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Конец")
     xx = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="XX")
+    tariff = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Тариф")
 
     # Потребление
     @property
@@ -48,7 +50,7 @@ class Invoice(models.Model):
     # Без НДС
     @property
     def without_vat(self):
-        return self.consumption * Decimal('50.527')
+        return self.consumption * self.tariff
 
     class Meta:
         verbose_name = 'Счет'
