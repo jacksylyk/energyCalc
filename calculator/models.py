@@ -66,3 +66,6 @@ class Invoice(models.Model):
     class Meta:
         verbose_name = 'Счет'
         verbose_name_plural = 'Счета'
+
+    def __str__(self):
+        return f"Cчет №{self.pk} - {self.client} "

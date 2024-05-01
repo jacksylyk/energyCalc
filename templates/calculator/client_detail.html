@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <h2 class="text-2xl font-bold my-3"> Клиент: {{ client.name }}</h2>
+        <h3 class="text-xl font-bold my-3">Счета:</h3>
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border-collapse border  border-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Клиент</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Местоположение ПКУ</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Информация по ПКУ</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Дата акта</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Напряжение (<b>кВ</b>)</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">БИН номер</th>
+                <th colspan="2" class="px-6 py-3 border-slate-700 border">Показания</th>
+                <th rowspan="2" class="px-6 py-3 border-slate-700 border">Расход</th>
+            </tr>
+            <tr>
+                <th scope="col" class="px-6 py-3  border-slate-700 border">Начало</th>
+                <th scope="col" class="px-6 py-3 border-slate-700 border">Конец</th>
+            </tr>
+            </thead>
+            <tbody class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            {% for invoice in client.invoices.all %}
+                <tr>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border-slate-600 border">{{ invoice.client }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.location }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.information }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.contract_date }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ invoice.voltage | floatformat:2 }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.bin_number }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ invoice.start | floatformat:2 }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ invoice.end | floatformat:2 }}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ invoice.consumption | floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

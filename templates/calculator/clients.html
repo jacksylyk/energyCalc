@@ -39,7 +39,7 @@
             </thead>
             <tbody>
             {% for client in clients %}
-                <tr class="bg-white border-b">
+                <tr class="bg-white border-b cursor-pointer" onclick="location.href='{% url 'client_detail' pk=client.pk %}';">
                     <td scope="row"
                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.name }}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.bin_number }}</td>

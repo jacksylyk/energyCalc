@@ -51,10 +51,20 @@ class ClientListView(LoginRequiredMixin, ListView):
         queryset = Client.objects.all()
         search_query = self.request.GET.get('q')
         if search_query:
-            queryset = queryset.filter(Q(bin_number__icontains=search_query) | Q(contract_number__icontains=search_query))
+            queryset = queryset.filter(
+                Q(bin_number__icontains=search_query) | Q(contract_number__icontains=search_query))
         return queryset
 
     template_name = 'calculator/clients.html'
+
+
+class ClientDetailView(DetailView):
+    model = Client
+    template_name = 'calculator/client_detail.html'
+    context_object_name = 'client'
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('invoices')
 
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
