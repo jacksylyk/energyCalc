@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView
@@ -47,7 +48,11 @@ class ClientListView(LoginRequiredMixin, ListView):
     context_object_name = 'clients'
 
     def get_queryset(self):
-        return Client.objects.all()
+        queryset = Client.objects.all()
+        search_query = self.request.GET.get('q')
+        if search_query:
+            queryset = queryset.filter(Q(bin_number__icontains=search_query) | Q(contract_number__icontains=search_query))
+        return queryset
 
     template_name = 'calculator/clients.html'
 

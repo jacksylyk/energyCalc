@@ -6,6 +6,16 @@ from django.db import models
 
 # Create your models here.
 class Client(models.Model):
+    LOCAL_BUDGET = 'Местный бюджет'
+    STATE_BUDGET = 'Республиканский бюджет'
+    LEGAL_ENTITY = 'Юридическое лицо'
+
+    CONSUMER_GROUP_CHOICES = [
+        (LOCAL_BUDGET, 'Местный бюджет'),
+        (STATE_BUDGET, 'Республиканский бюджет'),
+        (LEGAL_ENTITY, 'Юридическое лицо'),
+    ]
+
     name = models.CharField(max_length=100, verbose_name="Наименование")
     bin_number = models.CharField(max_length=12, verbose_name="БИН номер")
     information = models.CharField(max_length=256, verbose_name="Информация ПКУ", blank=True)
@@ -14,6 +24,7 @@ class Client(models.Model):
     location = models.CharField(max_length=128, verbose_name="Местоположение ПКУ", blank=True)
     notes = models.CharField(max_length=256, verbose_name="Примечания", blank=True)
     address = models.CharField(max_length=256, verbose_name="Юридический адрес", blank=True)
+    consumer_group = models.CharField(max_length=50, choices=CONSUMER_GROUP_CHOICES, verbose_name="Группа потребителей", default=LOCAL_BUDGET)
 
     class Meta:
         verbose_name_plural = 'Клиенты'
