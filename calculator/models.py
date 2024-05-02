@@ -55,22 +55,14 @@ class Invoice(models.Model):
     tariff = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
                                  verbose_name="Тариф")
     loss_xx = models.IntegerField(verbose_name="Потери XX", default=0)
-    loss_status = models.BooleanField(default=False)
     recalculation = models.IntegerField(verbose_name="Перерасчет")
-    recalculation_status = models.BooleanField(default=False)
 
     @property
     def consumption(self):
         result = ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
-        if self.loss_status:
-            result = (100 + self.loss_xx) * result
-        else:
-            result = (100 - self.loss_xx) * result
+        result = (100 + self.loss_xx) * result
 
-        if self.recalculation:
-            result = (100 + self.recalculation) * result
-        else:
-            result = (100 - self.recalculation) * result
+        result = (100 + self.recalculation) * result
 
         return result
 

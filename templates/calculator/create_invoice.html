@@ -14,7 +14,7 @@
                     {% if client.id == form.initial.client|string_to_int %}
                         <option value="{{ client.id }}" selected>{{ client.name }}</option>
                     {% else %}
-                        <option value="{{ client.id }}" >{{ client.name }}</option>
+                        <option value="{{ client.id }}">{{ client.name }}</option>
                     {% endif %}
                 {% endfor %}
             </select>
@@ -59,6 +59,44 @@
             />
         </div>
         <div class="mb-6">
+            <label for="{{ form.loss_xx.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Потери XX</label>
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" id="toggleLosses">
+                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Добавить</span>
+            </label>
+        </div>
+        <div class="mb-6">
+            <div data-popover id="popover-default" role="tooltip"
+                 class="absolute z-10 invisible inline-block w-64 text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800">
+                <div class="px-3 py-2">
+                    <p>Вводите число со знаком минус (-), если желаете выполнить вычитание</p>
+                </div>
+                <div data-popper-arrow></div>
+            </div>
+            <input data-popover-target="popover-default" type="number" id="{{ form.loss_xx.id_for_label }}" name="{{ form.loss_xx.name }}"
+                   class="hidden bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   required
+                   placeholder="потери XX %"
+            />
+        </div>
+        <div class="mb-6">
+            <label for="{{ form.recalculation.id_for_label }}"
+                   class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Перерасчет</label>
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer" id="toggleRecalc">
+                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Добавить</span>
+            </label>
+        </div>
+        <div class="mb-6">
+            <input type="number" id="{{ form.recalculation.id_for_label }}" name="{{ form.recalculation.name }}"
+                   class="hidden bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   required
+            />
+        </div>
+        <div class="mb-6">
             <label for="{{ form.tariff.id_for_label }}"
                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Тариф</label>
             <input type="number" id="{{ form.tariff.id_for_label }}" name="{{ form.tariff.name }}"
@@ -71,15 +109,26 @@
             Создать счет
         </button>
     </form>
+    <script>
+        const checkboxLoss = document.getElementById('toggleLosses');
+        const inputFieldContainerLoss = document.getElementById('id_loss_xx');
+
+        checkboxLoss.addEventListener('change', function () {
+            if (this.checked) {
+                inputFieldContainerLoss.style.display = 'block';
+            } else {
+                inputFieldContainerLoss.style.display = 'none';
+            }
+        });
+        const checkbox = document.getElementById('toggleRecalc');
+        const inputFieldContainer = document.getElementById('id_recalculation');
+
+        checkbox.addEventListener('change', function () {
+            if (this.checked) {
+                inputFieldContainer.style.display = 'block';
+            } else {
+                inputFieldContainer.style.display = 'none';
+            }
+        });
+    </script>
 {% endblock %}
-{#{% extends 'base.html' %}#}
-{#{% block content %}#}
-{#    <div class="text-3xl font-semibold my-6">Создать счет</div>#}
-{#    <form method="post">#}
-{#        {% csrf_token %}#}
-{#        {{ form.as_p }}#}
-{#        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">#}
-{#            Создать счет#}
-{#        </button>#}
-{#    </form>#}
-{#{% endblock %}#}
