@@ -24,7 +24,8 @@ class Client(models.Model):
     location = models.CharField(max_length=128, verbose_name="Местоположение ПКУ", blank=True)
     notes = models.CharField(max_length=256, verbose_name="Примечания", blank=True)
     address = models.CharField(max_length=256, verbose_name="Юридический адрес", blank=True)
-    consumer_group = models.CharField(max_length=50, choices=CONSUMER_GROUP_CHOICES, verbose_name="Группа потребителей", default=LOCAL_BUDGET)
+    consumer_group = models.CharField(max_length=50, choices=CONSUMER_GROUP_CHOICES, verbose_name="Группа потребителей",
+                                      default=LOCAL_BUDGET)
 
     class Meta:
         verbose_name_plural = 'Клиенты'
@@ -51,14 +52,28 @@ class Invoice(models.Model):
                                 verbose_name="Начало")
     end = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Конец")
     xx = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="XX")
-    tariff = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Тариф")
+    tariff = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
+                                 verbose_name="Тариф")
+    loss_xx = models.IntegerField(verbose_name="Потери XX", default=0)
+    loss_status = models.BooleanField(default=False)
+    recalculation = models.IntegerField(verbose_name="Перерасчет")
+    recalculation_status = models.BooleanField(default=False)
 
-    # Потребление
     @property
     def consumption(self):
-        return ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
+        result = ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
+        if self.loss_status:
+            result = (100 + self.loss_xx) * result
+        else:
+            result = (100 - self.loss_xx) * result
 
-    # Без НДС
+        if self.recalculation:
+            result = (100 + self.recalculation) * result
+        else:
+            result = (100 - self.recalculation) * result
+
+        return result
+
     @property
     def without_vat(self):
         return self.consumption * self.tariff
