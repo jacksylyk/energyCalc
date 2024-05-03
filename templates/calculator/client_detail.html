@@ -22,7 +22,7 @@
             </thead>
             <tbody class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
             {% for invoice in client.invoices.all %}
-                <tr>
+                <tr class="cursor-pointer" onclick="location.href='{% url 'invoice_detail' pk=invoice.pk %}';">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border-slate-600 border">{{ invoice.client }}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.location }}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white border border-slate-600">{{ client.information }}</td>
