@@ -42,7 +42,6 @@ class Contact(models.Model):
         return self.contact
 
 
-# Модель для счета
 class Invoice(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices', verbose_name="Клиент")
     ktt = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="KTT")

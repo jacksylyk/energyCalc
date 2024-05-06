@@ -3,12 +3,14 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic import ListView, CreateView, DetailView, TemplateView
 
 from calculator.models import Client, Contact, Invoice
-
+from calculator.resources import ClientResource
+import pandas as pd
 
 # Create your views here.
 @login_required
@@ -66,6 +68,41 @@ class ClientDetailView(DetailView):
     def get_queryset(self):
         return super().get_queryset().prefetch_related('invoices')
 
+class ClientExportView(LoginRequiredMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        client_id = self.kwargs['client_id']
+        client = Client.objects.get(pk=client_id)
+
+        invoices = client.invoices.all()
+        df = self.prepare_dataframe(invoices)
+
+        # Export DataFrame to Excel
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="client_invoices.xlsx"'
+        df.to_excel(response, index=False)
+
+        return response
+
+    def prepare_dataframe(self, invoices):
+        data = [
+            {
+                'Client': invoice.client,
+                'Location': invoice.client.location,
+                'Information': invoice.client.information,
+                'Contract Date': invoice.client.contract_date,
+                'Voltage': invoice.voltage,
+                'BIN Number': invoice.client.bin_number,
+                'Start': invoice.start,
+                'End': invoice.end,
+                'Consumption': invoice.consumption,
+                'Without VAT': invoice.without_vat,
+                'Meter Readings': [invoice.start, invoice.end]
+            }
+            for invoice in invoices
+        ]
+
+        df = pd.DataFrame(data)
+        return df
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     model = Invoice
