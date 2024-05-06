@@ -10,7 +10,7 @@ from django.views.generic import ListView, CreateView, DetailView, TemplateView
 
 from calculator.models import Client, Contact, Invoice
 from calculator.resources import ClientResource
-import pandas as pd
+
 
 # Create your views here.
 @login_required
@@ -68,18 +68,17 @@ class ClientDetailView(DetailView):
     def get_queryset(self):
         return super().get_queryset().prefetch_related('invoices')
 
+
 class ClientExportView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         client_id = self.kwargs['client_id']
         client = Client.objects.get(pk=client_id)
+        dataset = ClientResource().export(client.invoices.all())
 
-        invoices = client.invoices.all()
-        df = self.prepare_dataframe(invoices)
-
-        # Export DataFrame to Excel
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        # Create response
+        response = HttpResponse(dataset.xlsx,
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename="client_invoices.xlsx"'
-        df.to_excel(response, index=False)
 
         return response
 
@@ -103,6 +102,7 @@ class ClientExportView(LoginRequiredMixin, TemplateView):
 
         df = pd.DataFrame(data)
         return df
+
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     model = Invoice

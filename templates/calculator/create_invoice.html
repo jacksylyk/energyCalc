@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% block content %}
-    <div class="text-3xl font-semibold my-6">Создать счет {{ form.initial.client }}</div>
+    <div class="text-3xl font-semibold my-6">Создать счет</div>
     <form method="post" action="{% url 'create_invoice' %}">
         {% csrf_token %}
         <div class="mb-6">

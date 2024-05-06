@@ -44,15 +44,12 @@ class Contact(models.Model):
 
 class Invoice(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices', verbose_name="Клиент")
-    ktt = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="KTT")
-    voltage = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
-                                  verbose_name="Напряжение")
-    start = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
-                                verbose_name="Начало")
-    end = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="Конец")
-    xx = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)], verbose_name="XX")
-    tariff = models.DecimalField(max_digits=10, decimal_places=4, validators=[MinValueValidator(0)],
-                                 verbose_name="Тариф")
+    ktt = models.FloatField(validators=[MinValueValidator(0)], verbose_name="KTT")
+    voltage = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Напряжение")
+    start = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Начало")
+    end = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Конец")
+    xx = models.FloatField(validators=[MinValueValidator(0)], verbose_name="XX")
+    tariff = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Тариф")
     loss_xx = models.IntegerField(verbose_name="Потери XX", default=0)
     recalculation = models.IntegerField(verbose_name="Перерасчет")
 
@@ -60,9 +57,7 @@ class Invoice(models.Model):
     def consumption(self):
         result = ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
         result = (100 + self.loss_xx) * result
-
         result = (100 + self.recalculation) * result
-
         return result
 
     @property

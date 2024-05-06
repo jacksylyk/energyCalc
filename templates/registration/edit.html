@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="bg-white overflow-hidden shadow rounded-lg border">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Профиль оператора
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                Здесь вы можете редактировать информацию о себе
+            </p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <form method="post">
+                {% csrf_token %}
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500 flex items-center">
+                        Имя
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <input type="text" name="first_name" {% if user.first_name %}
+                               value="{{ user.first_name }}" {% else %} value="" {% endif %}
+                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    </dd>
+                </div>
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500 flex items-center">
+                        Фамилия
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <input type="text" name="last_name" {% if user.last_name %}
+                               value="{{ user.last_name }}" {% else %} value="" {% endif %}
+                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    </dd>
+                </div>
+                <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500 flex items-center">
+                        Отчество
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <input type="text" name="second_name" {% if user.second_name %}
+                               value="{{ user.second_name }}" {% else %} value="" {% endif %}
+                               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    </dd>
+                </div>
+                <div class="p-3 flex justify-end">
+                    <button type="submit"
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                        Применить
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

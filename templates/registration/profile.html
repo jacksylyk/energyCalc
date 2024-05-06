@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white overflow-hidden shadow rounded-lg border">
+    <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+            Профиль оператора
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+            Здесь вы можете редактировать информацию о себе
+        </p>
+    </div>
+    <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+        <dl class="sm:divide-y sm:divide-gray-200">
+            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">
+                    Имя
+                </dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if user.first_name %}
+                    	{{ user.first_name }}
+                    {% else %}
+                        Нет
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">
+                    Фамилия
+                </dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if user.last_name %}
+                    	{{ user.last_name }}
+                    {% else %}
+                        Нет
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">
+                    Отчество
+                </dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if user.second_name %}
+                    	{{ user.second_name }}
+                    {% else %}
+                        Нет
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="p-3 flex justify-end">
+                <button onclick="location.href='{% url 'users:edit' %}'" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Редактировать</button>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock content %}
