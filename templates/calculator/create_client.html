@@ -2,7 +2,7 @@
 {% block content %}
     <div class="flex gap-3 flex-col w-1/4  mx-auto p-4 pt-6 md:p-6 lg:p-12 bg-white rounded shadow-md">
         <div class="text-3xl font-semibold">Добавить клиента</div>
-        <form method="post">
+        <form method="post" action="{% url 'create_client' %}">
             {% csrf_token %}
             <div class="mb-6">
                 <label for="id_name"
@@ -38,7 +38,7 @@
                     </svg>
                 </div>
 
-                <input datepicker datepicker-format="mm.dd.yyyy" type="text" id="id_contract_date" name="contract_date" autocomplete="off"
+                <input datepicker datepicker-format="dd.mm.yyyy" type="text" id="id_contract_date" name="contract_date" autocomplete="off"
                        required
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                        placeholder="Выберите дату">

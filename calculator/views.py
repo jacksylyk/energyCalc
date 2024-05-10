@@ -31,6 +31,7 @@ class ClientCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('clients')
 
     def form_valid(self, form):
+        # Save client and contacts
         form.instance.user = self.request.user
         return self.save_with_contacts(form)
 
