@@ -1,4 +1,5 @@
 import json
+from datetime import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,9 +8,14 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, TemplateView
+from django.views import View
+from openpyxl import Workbook
+from openpyxl.styles import Font, Border, Side, Alignment
+from openpyxl.writer.excel import save_virtual_workbook
 
 from calculator.models import Client, Contact, Invoice
-from calculator.resources import ClientResource
+import openpyxl
+from openpyxl.utils import get_column_letter
 
 
 # Create your views here.
@@ -22,6 +28,13 @@ def create_contacts_from_json(client_instance, json_data):
     contacts_array = json.loads(json_data)
     for contact_data in contacts_array:
         contact = Contact.objects.create(client=client_instance, contact=contact_data['phone'])
+
+
+def format_date(date):
+    if date:
+        return date.strftime('%d.%m.%Y')
+    else:
+        return None
 
 
 class ClientCreateView(LoginRequiredMixin, CreateView):
@@ -70,39 +83,99 @@ class ClientDetailView(DetailView):
         return super().get_queryset().prefetch_related('invoices')
 
 
-class ClientExportView(LoginRequiredMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
-        client_id = self.kwargs['client_id']
-        client = Client.objects.get(pk=client_id)
-        dataset = ClientResource().export(client.invoices.all())
+class ClientExportView(View):
+    def get(self, request, client_id):
+        # Get the client by ID
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return HttpResponse("Client not found", status=404)
 
-        # Create response
-        response = HttpResponse(dataset.xlsx,
-                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="client_invoices.xlsx"'
+        invoices = Invoice.objects.filter(client=client)
 
+        excel_data = self.export_invoices_to_excel(invoices)
+
+        response = HttpResponse(
+            excel_data,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename={client.name}_invoices.xlsx'
         return response
 
-    def prepare_dataframe(self, invoices):
-        data = [
-            {
-                'Client': invoice.client,
-                'Location': invoice.client.location,
-                'Information': invoice.client.information,
-                'Contract Date': invoice.client.contract_date,
-                'Voltage': invoice.voltage,
-                'BIN Number': invoice.client.bin_number,
-                'Start': invoice.start,
-                'End': invoice.end,
-                'Consumption': invoice.consumption,
-                'Without VAT': invoice.without_vat,
-                'Meter Readings': [invoice.start, invoice.end]
-            }
-            for invoice in invoices
+    def export_invoices_to_excel(self, invoices):
+        # Create a new workbook
+        wb = Workbook()
+        ws = wb.active
+
+        # Define the headers
+        headers = [
+            'Наименование клиента', 'Местоположение ПКУ', 'Информация по ПКУ', 'Дата акта', 'Напряжение (U)',
+            'Начало показании', 'Конец показании', 'Расход', "Создан"
         ]
 
-        df = pd.DataFrame(data)
-        return df
+        # Write the headers to the worksheet
+        ws.append(headers)
+
+        # Make the header cells bold and apply border
+        for row in ws.iter_rows(min_row=1, max_row=1):
+            for cell in row:
+                cell.font = Font(bold=True)
+                cell.border = Border(bottom=Side(style='thin'))
+                cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+        # Write the invoice data to the worksheet
+        for invoice in invoices:
+            ws.append([
+                invoice.client.name,
+                invoice.client.location,
+                invoice.client.information,
+                format_date(invoice.client.contract_date),
+                invoice.voltage,
+                invoice.start,
+                invoice.end,
+                invoice.consumption,
+                format_date(invoice.created_at)
+            ])
+
+        # Apply border to all cells in the table
+        for row in ws.iter_rows(min_row=1, max_row=len(invoices) + 1, min_col=1, max_col=len(headers)):
+            for cell in row:
+                cell.border = Border(top=Side(style='thin'), bottom=Side(style='thin'), left=Side(style='thin'),
+                                     right=Side(style='thin'))
+                cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+        # Calculate the total for the "Расход" column
+        total_row = ['Total']
+        for _ in range(len(headers) - 2):  # Skip the first empty cell
+            total_row.append('')
+
+        # Calculate the total for the "Расход" column
+        total_consumption = sum(invoice.consumption for invoice in invoices)
+        total_row.append(total_consumption)
+        ws.append(total_row)
+
+        # Apply border to the total row
+        for row in ws.iter_rows(min_row=len(invoices) + 2, max_row=len(invoices) + 2, min_col=1, max_col=len(headers)):
+            for cell in row:
+                cell.border = Border(top=Side(style='thin'), bottom=Side(style='thin'), left=Side(style='thin'),
+                                     right=Side(style='thin'))
+
+        # Adjust column widths for better readability
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2) * 1.2
+            ws.column_dimensions[column].width = adjusted_width
+
+        # Save the workbook to a virtual file
+        virtual_workbook = save_virtual_workbook(wb)
+        return virtual_workbook
 
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):

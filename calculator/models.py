@@ -52,6 +52,7 @@ class Invoice(models.Model):
     tariff = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Тариф")
     loss_xx = models.IntegerField(verbose_name="Потери XX", default=0)
     recalculation = models.IntegerField(verbose_name="Перерасчет")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
 
     @property
     def consumption(self):
