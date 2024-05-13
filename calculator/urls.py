@@ -13,4 +13,5 @@ urlpatterns = [
     path('invoice/create', views.InvoiceCreateView.as_view(), name='create_invoice'),
     path('invoice/<int:pk>/', views.InvoiceDetailView.as_view(), name='invoice_detail'),
     path('client/export/<int:client_id>', views.ClientExportView.as_view(), name='client_export'),
+    path('export-checked-clients/', views.CheckedClientsExportView.as_view(), name='export_checked_clients'),
 ]

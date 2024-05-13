@@ -44,12 +44,12 @@ class Contact(models.Model):
 
 class Invoice(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='invoices', verbose_name="Клиент")
-    ktt = models.FloatField(validators=[MinValueValidator(0)], verbose_name="KTT")
-    voltage = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Напряжение")
-    start = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Начало")
-    end = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Конец")
-    xx = models.FloatField(validators=[MinValueValidator(0)], verbose_name="XX")
-    tariff = models.FloatField(validators=[MinValueValidator(0)], verbose_name="Тариф")
+    ktt = models.FloatField(verbose_name="KTT")
+    voltage = models.FloatField(verbose_name="Напряжение")
+    start = models.FloatField(verbose_name="Начало")
+    end = models.FloatField( verbose_name="Конец")
+    xx = models.FloatField(verbose_name="XX")
+    tariff = models.FloatField(verbose_name="Тариф")
     loss_xx = models.IntegerField(verbose_name="Потери XX", default=0)
     recalculation = models.IntegerField(verbose_name="Перерасчет")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
@@ -59,7 +59,7 @@ class Invoice(models.Model):
         result = ((self.end - self.start) * self.ktt) * ((self.xx + 100) / 100)
         result = (100 + self.loss_xx) * result
         result = (100 + self.recalculation) * result
-        return result
+        return result / 10000
 
     @property
     def without_vat(self):

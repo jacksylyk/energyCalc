@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="flex flex-col justify-center gap-5 my-3 p-4">
+    <div class="w-3/4 flex flex-col justify-center gap-5 my-3 p-4">
+
         <div class="flex justify-between items-center">
             <div class="text-2xl font-semibold">Client List</div>
             <div class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-end pb-4">
@@ -24,43 +25,72 @@
 
             </div>
         </div>
-        <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
-            <tr>
-                <th scope="col" class="px-6 py-3">Наименование</th>
-                <th scope="col" class="px-6 py-3">БИН</th>
-                <th scope="col" class="px-6 py-3">Информация ПКУ</th>
-                <th scope="col" class="px-6 py-3">Примечания</th>
-                <th scope="col" class="px-6 py-3">Номер договора</th>
-                <th scope="col" class="px-6 py-3">Дата акта</th>
-                <th scope="col" class="px-6 py-3">Контактные данные</th>
-                <th scope="col" class="px-6 py-3">Местоположение ПКУ</th>
-                <th scope="col" class="px-6 py-3">Группа потребителей</th>
-                <th scope="col" class="px-6 py-3">Счет</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for client in clients %}
-                <tr class="bg-white border-b cursor-pointer" onclick="location.href='{% url 'client_detail' pk=client.pk %}';">
-                    <td scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.name }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.bin_number }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.information }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.notes }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.contract_number }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.contract_date }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
-                        {% for contact in client.contacts.all %}
-                            <p>{{ contact.contact }}</p>
-                        {% endfor %}
-                    </td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ client.location }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{{ client.consumer_group }}</td>
-                    <td><a href="{% url 'create_invoice' %}?client_id={{ client.id }}">Создать счет</a></td>
+        <form action="{% url 'export_checked_clients' %}" method="post" id="checkForm" onsubmit="return validateForm()">
+            <div class="w-full flex justify-end py-3">
+                <button type="submit" id="submitBtn"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 d-flex gap-4">
+                    <svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="18"
+                         height="18"
+                         viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round">
+                        <path d="M3 15v4c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4M17 9l-5 5-5-5M12 12.8V2.5"
+                              stroke="#FFFFFF"
+                              fill="none" stroke-width="3px"></path>
+                    </svg>
+                    Экспорт в Excel
+                </button>
+            </div>
+            {% csrf_token %}
+
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="p-4">
+
+                    </th>
+                    <th scope="col" class="px-6 py-3">Наименование</th>
+                    <th scope="col" class="px-6 py-3">БИН</th>
+                    <th scope="col" class="px-6 py-3">Информация ПКУ</th>
+                    <th scope="col" class="px-6 py-3">Примечания</th>
+                    <th scope="col" class="px-6 py-3">Номер договора</th>
+                    <th scope="col" class="px-6 py-3">Дата акта</th>
+                    <th scope="col" class="px-6 py-3">Контактные данные</th>
+                    <th scope="col" class="px-6 py-3">Местоположение ПКУ</th>
+                    <th scope="col" class="px-6 py-3">Группа потребителей</th>
+                    <th scope="col" class="px-6 py-3">Счет</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for client in clients %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="w34 p-4">
+                            <div class="flex items-center">
+                                <input id="checkbox-table-search-{{ client.id }}" type="checkbox"
+                                       class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                       name="client_id" value="{{ client.id }}">
+                                <label for="checkbox-table-search-{{ client.id }}" class="sr-only">checkbox</label>
+                            </div>
+                        </td>
+                        <td scope="row"
+                            class="px-6 py-4 font-medium text-gray-900 whitespace-wrap cursor-pointer hover:text-blue-600"
+                            onclick="location.href='{% url 'client_detail' pk=client.pk %}';">{{ client.name }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.bin_number }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.information }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.notes }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.contract_number }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.contract_date }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">
+                            {% for contact in client.contacts.all %}
+                                <p>{{ contact.contact }}</p>
+                            {% endfor %}
+                        </td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.location }}</td>
+                        <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.consumer_group }}</td>
+                        <td><a href="{% url 'create_invoice' %}?client_id={{ client.id }}">Создать счет</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
     </div>
     <script>
         var typingTimer;
@@ -91,6 +121,22 @@
         searchForm.addEventListener('submit', function () {
             searchInput.value = originalSearchValue;
         });
+    </script>
+    <script>
+        function validateForm() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var checked = false;
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    checked = true;
+                }
+            });
+            if (!checked) {
+                alert("Пожалуста, выберите хотя бы одного клиента");
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
     </script>
 
 

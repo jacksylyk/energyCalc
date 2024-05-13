@@ -83,6 +83,87 @@ class ClientDetailView(DetailView):
         return super().get_queryset().prefetch_related('invoices')
 
 
+def export_checked_clients(request):
+    if request.method == 'POST':
+        selected_client_ids = request.POST.getlist('client_id')
+        selected_clients = Client.objects.filter(pk__in=selected_client_ids)
+
+        print(selected_clients)
+        return json.dumps(selected_clients)
+
+
+class CheckedClientsExportView(View):
+    def post(self, request):
+        selected_client_ids = request.POST.getlist('client_id')
+        clients = Client.objects.filter(pk__in=selected_client_ids)
+        # Create a new workbook
+        wb = Workbook()
+        ws = wb.active
+
+        # Define the headers
+        headers = [
+            'Наименование клиента', 'Местоположение ПКУ', 'Информация по ПКУ', 'Дата акта', 'Напряжение (U)',
+            'Начало показании', 'Конец показании', 'Расход', "Создан"
+        ]
+
+        # Write the headers to the worksheet
+        ws.append(headers)
+
+        # Make the header cells bold and apply border
+        for row in ws.iter_rows(min_row=1, max_row=1):
+            for cell in row:
+                cell.font = Font(bold=True)
+                cell.border = Border(bottom=Side(style='thin'))
+                cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+        # Write client data to the worksheet
+        for client in clients:
+            invoices = Invoice.objects.filter(client=client)
+            for invoice in invoices:
+                ws.append([
+                    client.name,
+                    client.location,
+                    client.information,
+                    format_date(client.contract_date),
+                    invoice.voltage,
+                    invoice.start,
+                    invoice.end,
+                    invoice.consumption,
+                    format_date(invoice.created_at)
+                ])
+
+        # Apply border to all cells in the table
+        for row in ws.iter_rows(min_row=1, max_row=len(clients) + 2, min_col=1, max_col=len(headers)):
+            for cell in row:
+                cell.border = Border(top=Side(style='thin'), bottom=Side(style='thin'), left=Side(style='thin'),
+                                     right=Side(style='thin'))
+                cell.alignment = Alignment(vertical='center', wrap_text=True)
+
+        # Adjust column widths for better readability
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column_letter
+            for cell in col:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 1) * 1.2
+            ws.column_dimensions[column].width = adjusted_width
+
+        # Save the workbook to a virtual file
+        virtual_workbook = save_virtual_workbook(wb)
+
+        # Return the Excel file as a response
+        response = HttpResponse(
+            virtual_workbook,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=clients_invoices.xlsx'
+        return response
+
+
 class ClientExportView(View):
     def get(self, request, client_id):
         # Get the client by ID
@@ -146,7 +227,7 @@ class ClientExportView(View):
 
         # Calculate the total for the "Расход" column
         total_row = ['Total']
-        for _ in range(len(headers) - 2):  # Skip the first empty cell
+        for _ in range(len(headers) - 1):  # Skip the first empty cell
             total_row.append('')
 
         # Calculate the total for the "Расход" column
