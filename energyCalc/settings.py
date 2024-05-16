@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'calculator',
-    'users'
+    'users',
+    'admin_panel'
 ]
 
 MIDDLEWARE = [

@@ -6,6 +6,8 @@ class Operator(AbstractUser):
     first_name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Имя")
     last_name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Фамилия")
     second_name = models.CharField(max_length=50, blank=True, null=True, verbose_name="Отчество")
+    is_superuser = models.BooleanField(default=False, verbose_name="Суперпользователь")
+
 
     class Meta:
         verbose_name_plural = 'Операторы'
