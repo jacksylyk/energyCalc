@@ -4,8 +4,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import View, ListView, DeleteView, UpdateView, CreateView
+from django.views.generic.edit import FormView
 
-from admin_panel.forms import OperatorCreationForm, OperatorChangeForm
+from admin_panel.forms import OperatorCreationForm, OperatorChangeForm, OperatorPasswordResetForm
 from calculator.models import Client, Invoice
 from calculator.views import create_contacts_from_json
 from users.models import Operator
@@ -75,6 +76,26 @@ class UserDeleteView(UserPassesTestMixin, DeleteView):
     def handle_no_permission(self):
         messages.error(self.request, "У вас недостаточно прав для доступа к этой странице.")
         return redirect('index')
+
+
+class UserResetPasswordView(UserPassesTestMixin, FormView):
+    form_class = OperatorPasswordResetForm
+    template_name = 'admin/reset_password_form.html'
+    success_url = reverse_lazy('manage_users')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        messages.error(self.request, "У вас недостаточно прав для доступа к этой странице.")
+        return redirect('index')
+
+    def form_valid(self, form):
+        user = Operator.objects.get(pk=self.kwargs['pk'])
+        user.set_password(form.cleaned_data['new_password'])
+        user.save()
+        messages.success(self.request, "Пароль успешно сброшен.")
+        return super().form_valid(form)
 
 
 class SuperuserClientsView(UserPassesTestMixin, ListView):

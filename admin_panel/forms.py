@@ -13,3 +13,11 @@ class OperatorChangeForm(forms.ModelForm):
     class Meta:
         model = Operator
         fields = ('username', 'first_name', 'last_name', 'second_name', 'is_superuser')
+
+
+class OperatorPasswordResetForm(forms.ModelForm):
+    new_password = forms.CharField(widget=forms.PasswordInput, label="Новый пароль")
+
+    class Meta:
+        model = Operator
+        fields = []

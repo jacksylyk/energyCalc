@@ -2,7 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView, UpdateView
-
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib import messages
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'registration/profile.html'
@@ -21,3 +22,14 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'registration/change_password.html'
+    success_url = reverse_lazy('users:me')
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field}: {error}")
+        return super().form_invalid(form)
