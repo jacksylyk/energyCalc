@@ -2,30 +2,33 @@
 {% block content %}
     <div class="flex gap-3 flex-col w-1/4  mx-auto p-4 pt-6 md:p-6 lg:p-12 bg-white rounded shadow-md">
         <div class="text-3xl font-semibold">Добавить клиента</div>
-        <form method="post" action="{% url 'create_client' %}">
+        <form method="post">
             {% csrf_token %}
             <div class="mb-6">
                 <label for="id_name"
                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Наименование</label>
-                <input type="text" id="id_name" name="name" maxlength="100" required
+                <input type="text" id="id_name" name="name" maxlength="100" required value="{{ client.name }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <div class="mb-6">
                 <label for="id_bin_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">БИН
                     номер:</label>
                 <input type="text" id="id_bin_number" name="bin_number" maxlength="12" required
+                       value="{{ client.bin_number }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <div class="mb-6">
                 <label for="id_information" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Информация
                     ПКУ:</label>
                 <input type="text" id="id_information" name="information" maxlength="256"
+                       value="{{ client.information }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <div class="mb-6">
                 <label for="id_contract_number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Номер
                     договора:</label>
-                <input type="text" id="id_contract_number" name="contract_number" maxlength="50" required
+                <input type="text" id="id_contract_number" name="contract_number" maxlength="50"
+                       required value="{{ client.contract_number }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <label for="id_contract_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Дата
@@ -38,7 +41,8 @@
                     </svg>
                 </div>
 
-                <input datepicker datepicker-format="dd.mm.yyyy" type="text" id="id_contract_date" name="contract_date" autocomplete="off"
+                <input datepicker datepicker-format="dd.mm.yyyy" type="text" id="id_contract_date" name="contract_date"
+                       autocomplete="off" value="{{ client.contract_date }}"
                        required
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                        placeholder="Выберите дату">
@@ -46,13 +50,13 @@
             <div class="mb-6">
                 <label for="id_location" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Местоположение
                     ПКУ:</label>
-                <input type="text" id="id_location" name="location" maxlength="128"
+                <input type="text" id="id_location" name="location" maxlength="128" value="{{ client.location }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <div class="mb-6">
                 <label for="id_address"
                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Юридический адрес:</label>
-                <input type="text" id="id_address" name="address" maxlength="256"
+                <input type="text" id="id_address" name="address" maxlength="256" value="{{ client.address }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <div class="mb-6">
@@ -61,14 +65,18 @@
                 <select id="id_consumer_group" name="consumer_group"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     {% for choice in form.consumer_group.field.choices %}
-                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% if choice.0 == client.consumer_group %}
+                            <option selected value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% else %}
+                            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
             <div class="mb-6">
                 <label for="id_notes"
                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Примечания:</label>
-                <input type="text" id="id_notes" name="notes" maxlength="256"
+                <input type="text" id="id_notes" name="notes" maxlength="256" value="{{ client.notes }}"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
             <!-- Contact formset -->
@@ -83,18 +91,37 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td class="px-3 py-4">
-                        <input type='text'
-                               class='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'>
-                    </td>
-                    <td>
-                        <button onclick='deleteContact(this)'
-                                class='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'>
-                            Удалить
-                        </button>
-                    </td>
-                </tr>
+                {% if client.contacts %}
+                    {% for contact in client.contacts.all %}
+                        <tr>
+                            <td class="px-3 py-4">
+                                <input type='text' value="{{ contact }}"
+                                       class='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'>
+                            </td>
+                            <td>
+                                <button onclick='deleteContact(this)'
+                                        class='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'>
+                                    Удалить
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td class="px-3 py-4">
+                            <input type='text'
+                                   class='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'>
+                        </td>
+                        <td>
+                            <button onclick='deleteContact(this)'
+                                    class='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900'>
+                                Удалить
+                            </button>
+                        </td>
+                    </tr>
+                {% endif %}
+
+
                 </tbody>
             </table>
             <button onclick="addContact()" type="button"
@@ -105,7 +132,7 @@
             <div>
                 <button type="submit" onclick="submitContacts()"
                         class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                    Создать клиента
+                    Сохранить
                 </button>
             </div>
         </form>

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-semibold mb-4">Удалить клиента</h1>
+        <p>Действительно хотите удалить клиента {{ object.username }}?</p>
+        <p>У этого клиента {{ invoice_count }} счетов</p>
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded">Удалить</button>
+            <a href="{% url 'manage_clients' %}" class="bg-gray-500 text-white py-2 px-4 rounded ml-4">Отмена</a>
+        </form>
+    </div>
+{% endblock %}

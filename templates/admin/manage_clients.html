@@ -1,8 +1,123 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    <div class="container">
-        <h1>Manage Users</h1>
-        <!-- Add your user management functionalities here: create, update, delete -->
+    <div class="w-3/4 flex flex-col justify-center gap-5 my-3 p-4">
+
+        <div class="flex justify-between items-center">
+            <div class="text-2xl font-semibold">Управление клиентами</div>
+            <div class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-end pb-4">
+                <form id="search-form" action="{% url 'clients' %}" method="get">
+                    <label for="table-search" class="sr-only">Search</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500 " aria-hidden="true" fill="currentColor"
+                                 viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd"
+                                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                      clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="table-search" name="q"
+                               class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
+                               placeholder="Search for items"
+                               value="{{ request.GET.q }}">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">Наименование</th>
+                <th scope="col" class="px-6 py-3">БИН</th>
+                <th scope="col" class="px-6 py-3">Информация ПКУ</th>
+                <th scope="col" class="px-6 py-3">Примечания</th>
+                <th scope="col" class="px-6 py-3">Номер договора</th>
+                <th scope="col" class="px-6 py-3">Дата акта</th>
+                <th scope="col" class="px-6 py-3">Контактные данные</th>
+                <th scope="col" class="px-6 py-3">Местоположение ПКУ</th>
+                <th scope="col" class="px-6 py-3">Группа потребителей</th>
+                <th scope="col" class="px-6 py-3">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for client in clients %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td scope="row"
+                        class="px-6 py-4 font-medium text-gray-900 whitespace-wrap cursor-pointer hover:text-blue-600"
+                        onclick="location.href='{% url 'client_detail' pk=client.pk %}';">{{ client.name }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.bin_number }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.information }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.notes }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.contract_number }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.contract_date }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">
+                        {% for contact in client.contacts.all %}
+                            <p>{{ contact.contact }}</p>
+                        {% endfor %}
+                    </td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.location }}</td>
+                    <td class="px-3 py-2 font-medium text-gray-900 whitespace-wrap">{{ client.consumer_group }}</td>
+                    <td class="px-6 py-4 flex flex-col">
+                        <div>
+                            <a href="{% url 'client_update' client.pk %}" class="text-indigo-600 hover:text-indigo-900">Редактировать</a>
+                        </div>
+                        <div>
+                            <a href="{% url 'client_delete' client.pk %}"
+                               class="text-red-600 hover:text-red-900">Удалить</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+    <script>
+        var typingTimer;
+        var doneTypingInterval = 500; // in milliseconds
+        var searchInput = document.getElementById('table-search');
+        var searchForm = document.getElementById('search-form');
+        var originalSearchValue = searchInput.value;
+
+        // On input, start a timer
+        searchInput.addEventListener('input', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        });
+
+        // On keyup, clear the timer and start it again
+        searchInput.addEventListener('keyup', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        });
+
+        // When user stops typing, submit the form
+        function doneTyping() {
+            originalSearchValue = searchInput.value; // Update original value before submission
+            searchForm.submit();
+        }
+
+        // Restore original value after form submission
+        searchForm.addEventListener('submit', function () {
+            searchInput.value = originalSearchValue;
+        });
+    </script>
+    <script>
+        function validateForm() {
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            var checked = false;
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    checked = true;
+                }
+            });
+            if (!checked) {
+                alert("Пожалуста, выберите хотя бы одного клиента");
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+    </script>
+
+
 {% endblock content %}
