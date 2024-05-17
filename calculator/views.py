@@ -229,7 +229,7 @@ class ClientExportView(View):
 
         # Calculate the total for the "Расход" column
         total_row = ['Total']
-        for _ in range(len(headers) - 1):  # Skip the first empty cell
+        for _ in range(len(headers) - 3):  # Skip the first empty cell
             total_row.append('')
 
         # Calculate the total for the "Расход" column
