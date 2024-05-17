@@ -1,8 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <h1>Manage Users</h1>
-        <!-- Add your user management functionalities here: create, update, delete -->
+    <div class="bg-white overflow-hidden shadow rounded-lg border">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">
+                Управление счетами
+            </h3>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+            <dl class=" sm:divide-gray-200">
+                {% for invoice in invoices %}
+                    <div class="py-3 sm:py-5 sm:grid sm:grid-cols-2 sm:gap-4 sm:px-6 cursor-pointer hover:bg-gray-100"
+                         onclick="location.href='{% url 'invoice_detail' pk=invoice.pk %}'">
+                        <dt class="text-sm font-medium text-gray-500">
+                            {{ invoice }}
+                        </dt>
+                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                            <a href="{% url 'invoice_delete' pk=invoice.pk %}" class="text-red-600 hover:text-red-900">Удалить</a>
+                        </dd>
+                    </div>
+                {% endfor %}
+
+            </dl>
+        </div>
     </div>
 {% endblock content %}

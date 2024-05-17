@@ -70,4 +70,4 @@ class Invoice(models.Model):
         verbose_name_plural = 'Счета'
 
     def __str__(self):
-        return f"Cчет №{self.pk} - {self.client} "
+        return f"Cчет за {self.created_at.strftime('%d.%m.%Y')} - Клиент:{self.client} "

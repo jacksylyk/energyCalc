@@ -6,7 +6,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import View, ListView, DeleteView, UpdateView, CreateView
 
 from admin_panel.forms import OperatorCreationForm, OperatorChangeForm
-from calculator.models import Client
+from calculator.models import Client, Invoice
 from calculator.views import create_contacts_from_json
 from users.models import Operator
 
@@ -143,13 +143,27 @@ class ClientDeleteView(UserPassesTestMixin, DeleteView):
         return context
 
 
-class SuperuserInvoicesView(UserPassesTestMixin, View):
+class SuperuserInvoicesView(UserPassesTestMixin, ListView):
+    model = Invoice
+    template_name = 'admin/manage_invoices.html'
+    context_object_name = 'invoices'
+
     def test_func(self):
         return self.request.user.is_superuser
 
     def handle_no_permission(self):
-        messages.error(self.request, "У вас недостаточно прав для доступа к этой странице.")
-        return HttpResponseRedirect(reverse('index'))
+        messages.error(self.request, "У вас недостаточно прав для доступа к этой странице.")
+        return redirect('index')
 
-    def get(self, request, *args, **kwargs):
-        return render(request, 'admin/manage_invoices.html')
+
+class InvoiceDeleteView(UserPassesTestMixin, DeleteView):
+    model = Invoice
+    template_name = 'admin/invoice_confirm_delete.html'
+    success_url = reverse_lazy('manage_invoices')
+
+    def test_func(self):
+        return self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        messages.error(self.request, "У вас недостаточно прав для доступа к этой странице.")
+        return redirect('index')
